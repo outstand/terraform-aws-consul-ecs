@@ -6,13 +6,42 @@ resource "aws_ecs_service" "this" {
   cluster         = var.ecs_cluster_arn
   task_definition = aws_ecs_task_definition.this.arn
   desired_count   = 1
+
   network_configuration {
     subnets          = var.subnets
     security_groups  = var.security_groups
     assign_public_ip = var.assign_public_ip
   }
-  launch_type            = var.launch_type
+
   enable_execute_command = true
+
+  launch_type = var.use_capacity_provider ? null : var.launch_type
+
+  dynamic "capacity_provider_strategy" {
+    for_each = var.use_capacity_provider ? [var.capacity_provider] : []
+
+    content {
+      capacity_provider = capacity_provider_strategy.value
+      weight = 100
+    }
+  }
+
+  dynamic "deployment_circuit_breaker" {
+    for_each = var.deployment_circuit_breaker[*]
+
+    content {
+      enable = deployment_circuit_breaker.value.enable
+      rollback = deployment_circuit_breaker.value.rollback
+    }
+  }
+
+  dynamic "deployment_controller" {
+    for_each = var.deployment_controller_type[*]
+
+    content {
+      type = deployment_controller.value
+    }
+  }
 }
 
 resource "aws_ecs_task_definition" "this" {

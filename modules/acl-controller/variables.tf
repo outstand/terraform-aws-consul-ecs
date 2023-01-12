@@ -23,6 +23,18 @@ variable "requires_compatibilities" {
   default     = ["EC2", "FARGATE"]
 }
 
+variable "use_capacity_provider" {
+  description = "Disables launch_type and uses a capacity provider"
+  type = bool
+  default = false
+}
+
+variable "capacity_provider" {
+  description = "Short name of the capacity provider."
+  type = string
+  default = null
+}
+
 variable "launch_type" {
   description = "Launch type on which to run service. Valid values are EC2 and FARGATE."
   type        = string
@@ -95,4 +107,16 @@ variable "additional_execution_role_policies" {
   description = "List of additional policy ARNs to attach to the execution role."
   type        = list(string)
   default     = []
+}
+
+variable "deployment_circuit_breaker" {
+  description = "Configuration block for deployment circuit breaker."
+  type = any
+  default = null
+}
+
+variable "deployment_controller_type" {
+  type = string
+  default = null
+  description = "Type of deployment controller."
 }

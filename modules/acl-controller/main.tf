@@ -151,14 +151,6 @@ resource "aws_iam_policy" "this_execution" {
           var.secret_kms_key_arn,
         ])
       },
-      {
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-        ],
-        Resource = "*"
-      }
     ]
   })
 }

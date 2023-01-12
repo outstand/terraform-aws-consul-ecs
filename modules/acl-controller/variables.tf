@@ -46,6 +46,12 @@ variable "consul_bootstrap_token_secret_arn" {
   type        = string
 }
 
+variable "secret_kms_key_arn" {
+  description = "KMS key (if used) to encrypt the SecretsManager secrets."
+  type = string
+  default = null
+}
+
 variable "log_configuration" {
   description = "Task definition log configuration object (https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_LogConfiguration.html)."
   type        = any

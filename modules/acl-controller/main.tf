@@ -136,62 +136,50 @@ resource "aws_iam_policy" "this_execution" {
   path        = "/ecs/"
   description = "Consul controller execution"
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "secretsmanager:GetSecretValue"
-      ],
-      "Resource": [
-        "${var.consul_bootstrap_token_secret_arn}"
-      ]
-    },
-%{if var.consul_server_ca_cert_arn != ""~}
-    {
-      "Effect": "Allow",
-      "Action": [
-        "secretsmanager:GetSecretValue"
-      ],
-      "Resource": [
-        "${var.consul_server_ca_cert_arn}"
-      ]
-    },
-%{endif~}
-    {
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-EOF
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "kms:Decrypt",
+        ],
+        Resource = compact([
+          var.consul_bootstrap_token_secret_arn,
+          var.consul_server_ca_cert_arn,
+          var.secret_kms_key_arn,
+        ])
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ],
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role" "this_execution" {
   name = "${var.name_prefix}-consul-acl-controller-execution"
   path = "/ecs/"
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "consul-controller-execution" {
@@ -203,4 +191,13 @@ resource "aws_iam_role_policy_attachment" "additional_execution_policies" {
   count      = length(var.additional_execution_role_policies)
   role       = aws_iam_role.this_execution.id
   policy_arn = var.additional_execution_role_policies[count.index]
+}
+
+data "aws_iam_policy" "ecs_execution_policy" {
+  arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "attach_ecs_execution_policy" {
+  role       = aws_iam_role.this_execution.id
+  policy_arn = data.aws_iam_policy.ecs_execution_policy.arn
 }

@@ -5,7 +5,7 @@ resource "aws_ecs_service" "this" {
   name            = "consul-acl-controller"
   cluster         = var.ecs_cluster_arn
   task_definition = aws_ecs_task_definition.this.arn
-  desired_count   = 1
+  desired_count   = var.enable ? 1 : 0
 
   network_configuration {
     subnets          = var.subnets

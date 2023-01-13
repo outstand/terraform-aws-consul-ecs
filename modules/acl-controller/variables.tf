@@ -126,3 +126,9 @@ variable "deployment_controller_type" {
   default = null
   description = "Type of deployment controller."
 }
+
+variable "enable" {
+  type = bool
+  default = true
+  description = "Enables the ECS service by scaling to 1."
+}

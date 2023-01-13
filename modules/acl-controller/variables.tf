@@ -132,3 +132,8 @@ variable "enable" {
   default = true
   description = "Enables the ECS service by scaling to 1."
 }
+
+variable "enable_execute_command" {
+  type = bool
+  default = true
+}

@@ -13,7 +13,7 @@ resource "aws_ecs_service" "this" {
     assign_public_ip = var.assign_public_ip
   }
 
-  enable_execute_command = true
+  enable_execute_command = var.enable_execute_command
 
   launch_type = var.use_capacity_provider ? null : var.launch_type
 

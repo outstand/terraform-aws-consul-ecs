@@ -482,3 +482,9 @@ variable "audit_logging" {
   type        = bool
   default     = false
 }
+
+variable "log_level" {
+  description = "Log level for consul-ecs sidecars"
+  type        = string
+  default     = "info"
+}

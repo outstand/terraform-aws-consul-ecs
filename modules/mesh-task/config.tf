@@ -37,6 +37,7 @@ locals {
     )
     healthSyncContainers = local.defaulted_check_containers
     bootstrapDir         = local.consul_data_mount.containerPath
+    logLevel             = var.log_level
   }
 
   encoded_config = jsonencode(local.config)

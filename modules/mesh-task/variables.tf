@@ -486,5 +486,10 @@ variable "audit_logging" {
 variable "log_level" {
   description = "Log level for consul-ecs sidecars"
   type        = string
-  default     = "info"
+  default     = "INFO"
+
+  validation {
+    error_message = "log_level must be one of: TRACE, DEBUG, INFO, WARN, ERROR"
+    condition = contains(["TRACE", "DEBUG", "INFO", "WARN", "ERROR"], var.log_level)
+  }
 }

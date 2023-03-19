@@ -324,7 +324,15 @@ resource "aws_ecs_task_definition" "this" {
             {
               name  = "CONSUL_ECS_CONFIG_JSON",
               value = local.encoded_config
-            }
+            },
+            {
+              name  = "CONSUL_NAMESPACE"
+              value = var.consul_namespace
+            },
+            {
+              name  = "CONSUL_PARTITION"
+              value = var.consul_partition
+            },
           ]
           portMappings = []
           mountPoints = [
